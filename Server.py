@@ -122,7 +122,7 @@ class Server(Socket):
         Link sender with client to transfer data
         """
         try:
-            sender_conn.send(b"connected")
+            self.send(sender_conn, b"connected")
             while True:
                 sender_data = self.receive(sender_conn)
                 for data in sender_data:

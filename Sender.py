@@ -35,6 +35,7 @@ class Sender(Client):
                     return
                 self.send(self.sock, inp)
                 data = self.receive(self.sock)
+                print(data)
                 for d in data:
                     if d == "status":
                         self.send(self.sock, b"sender")
@@ -61,7 +62,7 @@ class Sender(Client):
             data = keyevent.name
             data = data.encode()
             exitflag = keyevent.name == '~'
-            self.sock.send(data)
+            self.send(self.sock, data)
 
         keyboard.on_press(send_keystrokes)
         print("Start typing:")
