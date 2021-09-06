@@ -1,34 +1,19 @@
 import keyboard
-import socket
 import sys, argparse
-
-BUFSZ = 64
-
-keyboard._winkeyboard._setup_name_tables()
-ALL_KEYS = set(keyboard._winkeyboard.from_name.keys())
+from Socket import Socket
 
 
-class Client:
+class Client(Socket):
     def __init__(self, ip, port, verbose=True, loop=False):
-        self.ip = ip
-        self.port = port
-        self.sock = socket.socket()
+        super().__init__(ip, port)
         self.loop = loop
         self.verbose = verbose
-
-    @staticmethod
-    def __send(conn, data):
-        if sys.getsizeof(data) > BUFSZ:
-            raise RuntimeError("Data is too big to send!")
-        else:
-            conn.send(data)
 
     def run(self):
         if self.loop:
             while True:
                 if self.__connect():
                     self.__start()
-                    self.sock = socket.socket()
         else:
             if self.__connect():
                 self.__start()
@@ -54,24 +39,21 @@ class Client:
     def __start(self):
         try:
             while True:
-                data = self.sock.recv(BUFSZ).decode("utf-8")
-                if data == "status":
-                    Client.__send(self.sock, b"client")
-                if data == "live":
-                    continue
-                elif data == "exit":
-                    return
-                else:
-                    try:
-                        if self.verbose:
-                            print(data)
-
-                        if len(data) > 1 and data in ALL_KEYS:
-                            keyboard.press_and_release(data)
-                        else:
-                            keyboard.write(data)
-                    except:
-                        pass
+                data = self.receive(self.sock)
+                for d in data:
+                    if d == "status":
+                        self.send(self.sock, b"client")
+                    if d == "live":
+                        continue
+                    elif d == "exit":
+                        return
+                    else:
+                        try:
+                            if self.verbose:
+                                print(d)
+                            keyboard.press_and_release(d)
+                        except:
+                            pass
         except ConnectionResetError:
             if self.verbose:
                 print("\nServer shut down.")
