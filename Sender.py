@@ -17,13 +17,13 @@ class Sender(Client):
         print("Server has shutdown.")
         exit()
 
-    def __start(self):
+    def start(self):
         """
         Where the main input is read, selections are made
         could be regarded as the menu
         """
         try:
-            data = self.receive(self.sock)
+            data = self.receive(self.sock)[0]
             if data != "status":
                 raise RuntimeError("No status requested")
             else:

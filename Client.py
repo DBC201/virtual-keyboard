@@ -12,13 +12,13 @@ class Client(Socket):
     def run(self):
         if self.loop:
             while True:
-                if self.__connect():
-                    self.__start()
+                if self.connect():
+                    self.start()
         else:
-            if self.__connect():
-                self.__start()
+            if self.connect():
+                self.start()
 
-    def __connect(self):
+    def connect(self):
         try:
             if self.verbose:
                 print("Attempting to connect ", (self.ip + ':' + str(self.port)))
@@ -36,7 +36,7 @@ class Client(Socket):
                 print("Connection succesfull!")
             return True
 
-    def __start(self):
+    def start(self):
         try:
             while True:
                 data = self.receive(self.sock)
@@ -51,7 +51,7 @@ class Client(Socket):
                         try:
                             if self.verbose:
                                 print(d)
-                            keyboard.press_and_release(d)
+                            # keyboard.press_and_release(d)
                         except:
                             pass
         except ConnectionResetError:

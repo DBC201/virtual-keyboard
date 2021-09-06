@@ -21,5 +21,5 @@ class Socket:
             conn.send(data)
 
     def receive(self, conn):
-        data = conn.recv(self.bufsz).decode("utf-8").split(self.terminating_character)
+        data = conn.recv(self.bufsz).decode("utf-8").split(self.terminating_character)[:-1]
         return data

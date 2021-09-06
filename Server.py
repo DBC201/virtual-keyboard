@@ -16,8 +16,8 @@ class Server(Socket):
         print("Listening to port:", self.port)
 
     def run(self):
-        listening_thread = threading.Thread(target=server.__listen, daemon=True)
-        start_thread = threading.Thread(target=server.__start, daemon=True)
+        listening_thread = threading.Thread(target=server.listen, daemon=True)
+        start_thread = threading.Thread(target=server.start, daemon=True)
 
         self.threads.put(listening_thread)
         self.threads.put(start_thread)
@@ -32,7 +32,7 @@ class Server(Socket):
             self.threads.get()
             self.threads.task_done()
 
-    def __listen(self):
+    def listen(self):
         """
         listens for incoming connections in a seperate thread
         """
@@ -86,7 +86,7 @@ class Server(Socket):
         except Exception as e:
             self.sender = None
 
-    def __start(self):
+    def start(self):
         """
         Reads input from sender
         Since there is only one sender, no threading is needed
@@ -108,7 +108,7 @@ class Server(Socket):
                             try:
                                 client = self.clients[int(inp)][0]
                                 self.link(self.sender[0], client)
-                            except ValueError:
+                            except:
                                 self.send(self.sender[0], b"error")
                 except Exception as e:
                     print("start:", e)
@@ -127,10 +127,10 @@ class Server(Socket):
                 sender_data = self.receive(sender_conn)
                 for data in sender_data:
                     print(data)
-                    if data == b"~":
+                    if data == "~":
                         return
                     else:
-                        self.send(client_conn, data)
+                        self.send(client_conn, data.encode())
         except Exception as e:
             print("link:", e)
             self.update_clients()
