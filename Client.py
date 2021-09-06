@@ -53,7 +53,7 @@ class Client(Socket):
                             if self.verbose:
                                 print(d)
                             keyboard.press_and_release(d)
-                            time.sleep(0.02)
+                            time.sleep(0.07)
                         except:
                             pass
         except ConnectionResetError:
