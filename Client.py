@@ -1,6 +1,7 @@
 import keyboard
 import sys, argparse
 from Socket import Socket
+import time
 
 
 class Client(Socket):
@@ -52,6 +53,7 @@ class Client(Socket):
                             if self.verbose:
                                 print(d)
                             keyboard.press_and_release(d)
+                            time.sleep(0.02)
                         except:
                             pass
         except ConnectionResetError:
