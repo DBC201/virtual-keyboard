@@ -30,6 +30,7 @@ class Socket:
             if character == '|':
                 data.append(current)
                 current = ""
+                starting_flag = False
             elif character == '#':
                 starting_flag = True
                 current = ""
