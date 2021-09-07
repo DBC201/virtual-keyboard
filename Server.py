@@ -95,6 +95,7 @@ class Server(Socket):
             while self.sender:
                 try:
                     print("listening")
+                    self.update_senders()
                     data = self.receive(self.sender[0])
                     for inp in data:
                         print("sender:", inp)
