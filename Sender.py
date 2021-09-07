@@ -1,7 +1,6 @@
 import keyboard
 import socket
 import sys, argparse
-import time
 from Client import Client
 
 
