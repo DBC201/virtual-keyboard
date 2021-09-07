@@ -57,7 +57,6 @@ class Client(Socket):
 
     def start(self):
         self.threads.put(threading.Thread(target=self.__keyboard_thread, daemon=True))
-        self.threads.join()
         try:
             while True:
                 data = self.receive(self.sock)
