@@ -51,8 +51,7 @@ class Client(Socket):
     def __keyboard_thread(self):
         while True:
             key = self.__keyboard_inputs.get()[len("key"):]
-            print(key)
-            # keyboard.press_and_release(key)
+            keyboard.press_and_release(key)
             time.sleep(0.07)
 
     def start(self):
@@ -75,9 +74,9 @@ class Client(Socket):
                                 self.__keyboard_inputs.put(d[len("key"):])
                             elif d[:len("move")] == "move":
                                 x, y = list(map(int, d[len("move"):].split(',')))
-                                #mouse.move(x, y, absolute=False)
+                                mouse.move(x, y, absolute=False)
                             elif d[:len("click")] == "click":
-                                # mouse.click(d[len("click"):])
+                                mouse.click(d[len("click"):])
                                 pass
                         except:
                             pass

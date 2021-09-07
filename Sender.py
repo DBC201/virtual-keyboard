@@ -102,7 +102,6 @@ def return_parser():
 
 
 if __name__ == '__main__':
-    '''parser = return_parser()
+    parser = return_parser()
     args = parser.parse_args(sys.argv[1:])
-    Sender(args.ip, args.port).run()'''
-    Sender("192.168.56.1", 41369).run()
+    Sender(args.ip, args.port).run()
