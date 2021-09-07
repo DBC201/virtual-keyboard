@@ -3,6 +3,14 @@ import mouse
 import socket
 import sys, argparse
 from Client import Client
+import time
+
+
+def truncate(num):
+    num *= 100
+    num = int(num)
+    num /= 100
+    return num
 
 
 class Sender(Client):
@@ -69,15 +77,18 @@ class Sender(Client):
         creates the mouse hook, helper function for listen_keyboard_and_mouse()
         """
         x, y = mouse.get_position()
+        last_time = time.time()
 
         def process_mouse_events(event):
-            nonlocal x, y
+            nonlocal x, y, last_time
             if type(event) == mouse.MoveEvent:
                 dx = event.x - x
                 dy = event.y - y
                 x = event.x
                 y = event.y
-                data = "move" + str(dx) + ',' + str(dy)
+                duration = time.time() - last_time
+                last_time = time.time()
+                data = "move" + str(truncate(duration)) + ';' + str(dx) + ',' + str(dy)
                 self.send(self.sock, data.encode())
             elif type(event) == mouse.ButtonEvent:
                 if event.event_type == "down":
