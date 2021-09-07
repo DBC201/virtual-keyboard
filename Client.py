@@ -52,7 +52,7 @@ class Client(Socket):
 
     def __keyboard_thread(self):
         while True:
-            key = self.__keyboard_inputs.get()
+            key = self.__keyboard_inputs.get()[len("key"):]
             print(key)
             # keyboard.press_and_release(key)
             time.sleep(0.07)
