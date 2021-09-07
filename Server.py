@@ -127,7 +127,7 @@ class Server(Socket):
                 sender_data = self.receive(sender_conn)
                 for data in sender_data:
                     print(data)
-                    if data == "~":
+                    if data == "key~":
                         return
                     else:
                         self.send(client_conn, data.encode())
