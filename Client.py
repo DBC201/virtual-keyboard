@@ -50,9 +50,10 @@ class Client(Socket):
 
     def __keyboard_thread(self):
         while True:
-            key = self.__keyboard_inputs.get()[len("key"):]
-            keyboard.press_and_release(key)
-            time.sleep(0.07)
+            if not self.__keyboard_inputs.empty():
+                key = self.__keyboard_inputs.get()[len("key"):]
+                keyboard.press_and_release(key)
+                time.sleep(0.07)
 
     def start(self):
         self.threads.put(threading.Thread(target=self.__keyboard_thread, daemon=True))
