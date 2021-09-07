@@ -55,20 +55,16 @@ class Sender(Client):
         Starts reading the keyboard to send data to server
         ~ to stop reading
         """
-        exitflag = False
 
         def send_keystrokes(keyevent):
-            nonlocal exitflag
-            data = keyevent.name
-            data = data.encode()
-            exitflag = keyevent.name == '~'
-            self.send(self.sock, data)
+            self.send(self.sock, keyevent.name.encode())
+            if keyevent.name == '~':
+                keyboard.unhook_all()
 
         keyboard.on_press(send_keystrokes)
         print("Start typing:")
-        while not exitflag:
-            time.sleep(0.31)  # 31 cektim
-        keyboard.unhook_all()
+        while input()[-1] != '~':
+            pass
 
 
 def return_parser():
