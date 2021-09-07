@@ -1,8 +1,6 @@
 import keyboard
 import sys, argparse
-
 import mouse
-
 from Socket import Socket
 import time
 import threading
