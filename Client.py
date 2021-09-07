@@ -1,7 +1,12 @@
 import keyboard
 import sys, argparse
+
+import mouse
+
 from Socket import Socket
 import time
+import threading
+from queue import Queue
 
 
 class Client(Socket):
@@ -9,6 +14,13 @@ class Client(Socket):
         super().__init__(ip, port)
         self.loop = loop
         self.verbose = verbose
+        self.__keyboard_inputs = Queue()
+        self.threads = Queue()
+
+    def kill_threads(self):
+        while not self.threads.empty():
+            self.threads.get()
+            self.threads.task_done()
 
     def run(self):
         if self.loop:
@@ -18,6 +30,7 @@ class Client(Socket):
         else:
             if self.connect():
                 self.start()
+        self.kill_threads()
 
     def connect(self):
         try:
@@ -37,7 +50,15 @@ class Client(Socket):
                 print("Connection succesfull!")
             return True
 
+    def __keyboard_thread(self):
+        while True:
+            key = self.__keyboard_inputs.get()
+            print(key)
+            # keyboard.press_and_release(key)
+            time.sleep(0.07)
+
     def start(self):
+        self.threads.put(threading.Thread(target=self.__keyboard_thread, daemon=True))
         try:
             while True:
                 data = self.receive(self.sock)
@@ -52,8 +73,14 @@ class Client(Socket):
                         try:
                             if self.verbose:
                                 print(d)
-                            # keyboard.press_and_release(d)
-                            # time.sleep(0.07)
+                            if d[:len("key")] == "key":
+                                self.__keyboard_inputs.put(d[len("key"):])
+                            elif d[:len("move")] == "move":
+                                x, y = list(map(int, d[len("move"):].split(',')))
+                                #mouse.move(x, y, absolute=False)
+                            elif d[:len("click")] == "click":
+                                # mouse.click(d[len("click"):])
+                                pass
                         except:
                             pass
         except ConnectionResetError:

@@ -14,6 +14,10 @@ class Sender(Client):
 
     @staticmethod
     def __handle_connection_reset():
+        """
+        This function runs on connection reset exception
+        :return:
+        """
         print("Server has shutdown.")
         exit()
 
@@ -51,12 +55,19 @@ class Sender(Client):
             raise e
 
     def process_keystrokes(self, keyevent):
-        self.send(self.sock, keyevent.name.encode())
+        """
+        the function for keyboard.hook(), sends the key presses to the server
+        """
+        data = b"key" + keyevent.name.encode()
+        self.send(self.sock, data)
         if keyevent.name == '~':
             keyboard.unhook_all()
             mouse.unhook_all()
 
     def create_mouse_hook(self):
+        """
+        creates the mouse hook, helper function for listen_keyboard_and_mouse()
+        """
         x, y = mouse.get_position()
 
         def process_mouse_events(event):
@@ -73,8 +84,11 @@ class Sender(Client):
         mouse.hook(process_mouse_events)
 
     def listen_keyboard_and_mouse(self):
+        """
+        handles and initiates both keyboard and mouse hooks
+        """
         keyboard.on_press(self.process_keystrokes)
-        # self.create_mouse_hook()
+        self.create_mouse_hook()
         print("Keyboard and mouse connected, press ~ and enter to disconnect")
         while input()[-1] != '~':
             pass
