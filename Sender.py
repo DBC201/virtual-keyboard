@@ -1,4 +1,5 @@
 import keyboard
+import mouse
 import socket
 import sys, argparse
 from Client import Client
@@ -41,7 +42,7 @@ class Sender(Client):
                     elif d == "live":
                         continue
                     elif d == "connected":
-                        self.read_keyboard()
+                        self.listen_keyboard_and_mouse()
                     else:
                         print(d)
         except ConnectionResetError:
@@ -49,19 +50,32 @@ class Sender(Client):
         except Exception as e:
             raise e
 
-    def read_keyboard(self):
-        """
-        Starts reading the keyboard to send data to server
-        ~ to stop reading
-        """
+    def process_keystrokes(self, keyevent):
+        self.send(self.sock, keyevent.name.encode())
+        if keyevent.name == '~':
+            keyboard.unhook_all()
+            mouse.unhook_all()
 
-        def send_keystrokes(keyevent):
-            self.send(self.sock, keyevent.name.encode())
-            if keyevent.name == '~':
-                keyboard.unhook_all()
+    def create_mouse_hook(self):
+        x, y = mouse.get_position()
 
-        keyboard.on_press(send_keystrokes)
-        print("Start typing:")
+        def process_mouse_events(event):
+            nonlocal x, y
+            if type(event) == mouse.MoveEvent:
+                x = event.x - x
+                y = event.y - y
+                data = "move" + str(x) + ',' + str(y)
+                self.send(self.sock, data.encode())
+            elif type(event) == mouse.ButtonEvent:
+                if event.event_type == "down":
+                    data = "click" + event.button
+                    self.send(self.sock, data.encode())
+        mouse.hook(process_mouse_events)
+
+    def listen_keyboard_and_mouse(self):
+        keyboard.on_press(self.process_keystrokes)
+        # self.create_mouse_hook()
+        print("Keyboard and mouse connected, press ~ and enter to disconnect")
         while input()[-1] != '~':
             pass
 
@@ -74,6 +88,7 @@ def return_parser():
 
 
 if __name__ == '__main__':
-    parser = return_parser()
+    '''parser = return_parser()
     args = parser.parse_args(sys.argv[1:])
-    Sender(args.ip, args.port).run()
+    Sender(args.ip, args.port).run()'''
+    Sender("192.168.56.1", 41369).run()

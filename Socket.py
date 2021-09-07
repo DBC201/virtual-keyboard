@@ -3,12 +3,13 @@ import sys
 
 
 class Socket:
-    def __init__(self, ip, port, bufsz=64, terminating_character='|'):
+    def __init__(self, ip, port):
         self.ip = ip
         self.port = port
         self.sock = socket.socket()
-        self.bufsz = bufsz
-        self.terminating_character = terminating_character
+        self.bufsz = 64
+        self.terminating_character = '|'
+        self.starting_character = '#'
 
     def run(self):
         pass
@@ -17,9 +18,23 @@ class Socket:
         if sys.getsizeof(data) > self.bufsz:
             raise RuntimeError("Data is too big to send!")
         else:
-            data += self.terminating_character.encode()
+            data = self.starting_character.encode() + data + self.terminating_character.encode()
             conn.send(data)
 
     def receive(self, conn):
-        data = conn.recv(self.bufsz).decode("utf-8").split(self.terminating_character)[:-1]
+        raw_data = conn.recv(self.bufsz).decode("utf-8")
+        data = []
+        current = ""
+        starting_flag = False
+        for character in raw_data:
+            if character == '|':
+                data.append(current)
+                current = ""
+            elif character == '#':
+                starting_flag = True
+                current = ""
+                continue
+
+            if starting_flag:
+                current += character
         return data
