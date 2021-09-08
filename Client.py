@@ -51,12 +51,14 @@ class Client(Socket):
     def __keyboard_thread(self):
         while True:
             if not self.__keyboard_inputs.empty():
-                key = self.__keyboard_inputs.get()[len("key"):]
+                key = self.__keyboard_inputs.get()
                 keyboard.press_and_release(key)
             time.sleep(0.07)
 
     def start(self):
-        self.threads.put(threading.Thread(target=self.__keyboard_thread, daemon=True))
+        keyboard_thread = threading.Thread(target=self.__keyboard_thread, daemon=True)
+        self.threads.put(keyboard_thread)
+        keyboard_thread.start()
         try:
             while True:
                 data = self.receive(self.sock)
@@ -77,7 +79,7 @@ class Client(Socket):
                                 duration, coordinates = d[len("move"):].split(';')
                                 duration = float(duration)
                                 x, y = list(map(int, coordinates.split(',')))
-                                mouse.move(x, y, absolute=False)
+                                # mouse.move(x, y, absolute=False)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
