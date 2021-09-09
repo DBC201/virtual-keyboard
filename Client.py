@@ -80,7 +80,7 @@ class Client(Socket):
                                 duration, coordinates = d[len("move"):].split(';')
                                 duration = float(duration)
                                 x, y = list(map(int, coordinates.split(',')))
-                                mouse.move(x, y, absolute=False)
+                                mouse.move(x, y, absolute=False, duration=duration)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
