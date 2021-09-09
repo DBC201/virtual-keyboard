@@ -87,10 +87,10 @@ class Client(Socket):
                                         x -= 1
 
                                     if y < 0:
-                                        mouse.move(-1, 0, absolute=False)
+                                        mouse.move(0, -1, absolute=False)
                                         y += 1
                                     elif y > 0:
-                                        mouse.move(1, 0, absolute=False)
+                                        mouse.move(0, 1, absolute=False)
                                         y -= 1
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
