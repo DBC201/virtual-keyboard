@@ -7,6 +7,30 @@ import threading
 from queue import Queue
 
 
+def simulate_raw(final_x, final_y):
+    curr_x, curr_y = mouse.get_position()
+    dx = final_x - curr_x
+    dy = final_y - curr_y
+    simulate(dx, dy)
+
+
+def simulate(dx, dy):
+    while dx != 0 or dy != 0:
+        if dx < 0:
+            mouse.move(-1, 0, absolute=False)
+            dx += 1
+        elif dx > 0:
+            mouse.move(1, 0, absolute=False)
+            dx -= 1
+
+        if dy < 0:
+            mouse.move(0, -1, absolute=False)
+            dy += 1
+        elif dy > 0:
+            mouse.move(0, 1, absolute=False)
+            dy -= 1
+
+
 class Client(Socket):
     def __init__(self, ip, port, verbose=True, loop=False):
         super().__init__(ip, port)
@@ -78,22 +102,10 @@ class Client(Socket):
                                 # pass
                             elif d[:len("move")] == "move":
                                 x, y = list(map(int, d[len("move"):].split(',')))
-                                # mouse.move(x, y, absolute=False)
-                                """while x != 0 or y != 0:
-                                    if x < 0:
-                                        mouse.move(-1, 0, absolute=False)
-                                        x += 1
-                                    elif x > 0:
-                                        mouse.move(1, 0, absolute=False)
-                                        x -= 1
-
-                                    if y < 0:
-                                        mouse.move(0, -1, absolute=False)
-                                        y += 1
-                                    elif y > 0:
-                                        mouse.move(0, 1, absolute=False)
-                                        y -= 1"""
-                                mouse.move(x, y)
+                                # mouse.move(x, y)
+                                # dx, dy = list(map(int, d[len("move"):].split(',')))
+                                # mouse.move(dx, dy, absolute=False)
+                                simulate_raw(x, y)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
