@@ -101,7 +101,7 @@ class Server(Socket):
                         if inp == "exit":
                             self.sender = None
                         if inp == "list":
-                            # Server.__send(self.sender[0], self.update_clients().encode())
+                            # self.send(self.sender[0], self.update_clients().encode())
                             self.update_clients()
                             self.send(self.sender[0], str(len(self.clients)).encode())  # to decrease bufsz to 64
                         else:
