@@ -7,14 +7,24 @@ import threading
 from queue import Queue
 
 
-def simulate_raw(final_x, final_y):
+def smoothen_raw(final_x, final_y):
+    """
+    Moves the mouse to the desired coordinate in a smoother manner
+    :param final_x: x to move
+    :param final_y: y to move
+    """
     curr_x, curr_y = mouse.get_position()
     dx = final_x - curr_x
     dy = final_y - curr_y
-    simulate(dx, dy)
+    smoothen(dx, dy)
 
 
-def simulate(dx, dy):
+def smoothen(dx, dy):
+    """
+    Moves the mouse by increments, aiming for a smoother movement
+    :param dx: change in x
+    :param dy: change in y
+    """
     while dx != 0 or dy != 0:
         if dx < 0:
             mouse.move(-1, 0, absolute=False)
@@ -105,7 +115,7 @@ class Client(Socket):
                                 # mouse.move(x, y)
                                 # dx, dy = list(map(int, d[len("move"):].split(',')))
                                 # mouse.move(dx, dy, absolute=False)
-                                simulate_raw(x, y)
+                                smoothen_raw(x, y)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
