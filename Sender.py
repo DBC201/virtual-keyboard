@@ -94,7 +94,7 @@ class Sender(Client):
                 if event.event_type == "down":
                     data = "click" + event.button
                     self.send(self.sock, data.encode())
-            mouse.move(0, 0)
+            mouse.move(0,0)
         mouse.hook(process_mouse_events)
 
     def listen_keyboard_and_mouse(self):
