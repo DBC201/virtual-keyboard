@@ -99,7 +99,7 @@ class Server(Socket):
                     for inp in data:
                         print("sender:", inp)
                         if inp == "exit":
-                            self.update_senders()
+                            self.sender = None
                         if inp == "list":
                             # Server.__send(self.sender[0], self.update_clients().encode())
                             self.update_clients()
