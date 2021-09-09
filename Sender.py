@@ -98,6 +98,9 @@ class Sender(Client):
                     else:
                         return
                     self.send(self.sock, data.encode())
+            elif type(event) == mouse.WheelEvent:
+                data = "scroll" + str(event.delta)
+                self.send(data.encode())
             # mouse.move(0, 0)
         mouse.hook(process_mouse_events)
 

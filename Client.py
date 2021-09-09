@@ -119,6 +119,9 @@ class Client(Socket):
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
+                            elif d[:len("scroll")] == "scroll":
+                                delta = int(d[len("move"):])
+                                mouse.wheel(delta)
                         except:
                             pass
         except ConnectionResetError:
