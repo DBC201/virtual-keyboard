@@ -84,7 +84,7 @@ class Sender(Client):
                 dy = event.y - y
                 x = event.x
                 y = event.y
-                data = str(dx) + ',' + str(dy)
+                data = "move" + str(dx) + ',' + str(dy)
                 self.send(self.sock, data.encode())
             elif type(event) == mouse.ButtonEvent:
                 if event.event_type == "down":
