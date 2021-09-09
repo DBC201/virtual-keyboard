@@ -80,11 +80,13 @@ class Sender(Client):
         def process_mouse_events(event):
             nonlocal x, y
             if type(event) == mouse.MoveEvent:
-                dx = event.x - x
+                """dx = event.x - x
                 dy = event.y - y
                 x = event.x
                 y = event.y
-                data = "move" + str(dx) + ',' + str(dy)
+                data = "move" + str(dx) + ',' + str(dy)"""
+                x, y = mouse.get_position()
+                data = "move" + str(x) + ',' + str(y)
                 self.send(self.sock, data.encode())
             elif type(event) == mouse.ButtonEvent:
                 if event.event_type == "down":

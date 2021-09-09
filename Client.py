@@ -78,7 +78,8 @@ class Client(Socket):
                                 # pass
                             elif d[:len("move")] == "move":
                                 x, y = list(map(int, d[len("move"):].split(',')))
-                                while x != 0 or y != 0:
+                                # mouse.move(x, y, absolute=False)
+                                """while x != 0 or y != 0:
                                     if x < 0:
                                         mouse.move(-1, 0, absolute=False)
                                         x += 1
@@ -91,7 +92,8 @@ class Client(Socket):
                                         y += 1
                                     elif y > 0:
                                         mouse.move(0, 1, absolute=False)
-                                        y -= 1
+                                        y -= 1"""
+                                mouse.move(x, y)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
