@@ -90,7 +90,13 @@ class Sender(Client):
                 self.send(self.sock, data.encode())
             elif type(event) == mouse.ButtonEvent:
                 if event.event_type == "down":
-                    data = "click" + event.button
+                    data = "click"
+                    if event.button == "x2":
+                        data += "left"
+                    elif event.button == "x":
+                        data += "right"
+                    else:
+                        return
                     self.send(self.sock, data.encode())
             # mouse.move(0, 0)
         mouse.hook(process_mouse_events)
