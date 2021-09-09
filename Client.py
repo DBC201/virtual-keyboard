@@ -74,7 +74,8 @@ class Client(Socket):
                             if self.verbose:
                                 print(d)
                             if d[:len("key")] == "key":
-                                self.__keyboard_inputs.put(d[len("key"):])
+                                # self.__keyboard_inputs.put(d[len("key"):])
+                                pass
                             elif d[:len("move")] == "move":
                                 duration, coordinates = d[len("move"):].split(';')
                                 duration = float(duration)
