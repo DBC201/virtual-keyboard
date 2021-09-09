@@ -74,13 +74,13 @@ class Client(Socket):
                             if self.verbose:
                                 print(d)
                             if d[:len("key")] == "key":
-                                # self.__keyboard_inputs.put(d[len("key"):])
-                                pass
+                                self.__keyboard_inputs.put(d[len("key"):])
+                                # pass
                             elif d[:len("move")] == "move":
                                 duration, coordinates = d[len("move"):].split(';')
                                 duration = float(duration)
                                 x, y = list(map(int, coordinates.split(',')))
-                                # mouse.move(x, y, absolute=False)
+                                mouse.move(x, y, absolute=False)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
