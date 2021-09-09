@@ -92,14 +92,14 @@ class Server(Socket):
         Since there is only one sender, no threading is needed
         """
         while True:
-            while self.sender:
+            while self.sender is not None:
                 try:
                     print("listening")
                     data = self.receive(self.sender[0])
                     for inp in data:
                         print("sender:", inp)
                         if inp == "exit":
-                            break # senders are updated outside the loop
+                            self.update_senders()
                         if inp == "list":
                             # Server.__send(self.sender[0], self.update_clients().encode())
                             self.update_clients()
