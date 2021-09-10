@@ -111,7 +111,7 @@ class Sender(Client):
         keyboard.on_press(self.process_keystrokes)
         self.create_mouse_hook()
         print("Keyboard and mouse connected, press ~ and enter to disconnect")
-        while input()[-1] != '~':
+        while input()[-1] != '~': # lmao just pressing enter gives an error
             pass
 
 

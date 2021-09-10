@@ -120,7 +120,7 @@ class Client(Socket):
                                 mouse.click(d[len("click"):])
                                 pass
                             elif d[:len("scroll")] == "scroll":
-                                delta = int(d[len("move"):])
+                                delta = float(d[len("scroll"):])
                                 mouse.wheel(delta)
                         except:
                             pass
