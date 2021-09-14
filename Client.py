@@ -111,11 +111,10 @@ class Client(Socket):
                                 self.__keyboard_inputs.put(d[len("key"):])
                                 # pass
                             elif d[:len("move")] == "move":
-                                x, y = list(map(int, d[len("move"):].split(',')))
-                                # mouse.move(x, y)
-                                # dx, dy = list(map(int, d[len("move"):].split(',')))
-                                # mouse.move(dx, dy, absolute=False)
-                                smoothen_raw(x, y)
+                                # x, y = list(map(int, d[len("move"):].split(',')))
+                                # smoothen_raw(x, y)
+                                dx, dy = list(map(int, d[len("move"):].split(',')))
+                                smoothen(dx, dy)
                             elif d[:len("click")] == "click":
                                 mouse.click(d[len("click"):])
                                 pass
