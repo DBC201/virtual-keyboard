@@ -111,10 +111,8 @@ class Sender(Client):
         keyboard.on_press(self.process_keystrokes)
         self.create_mouse_hook()
         print("Keyboard and mouse connected, press ~ and enter to disconnect")
-        while True:
-            inp = input()
-            if len(inp) > 0 and inp == '~':
-                break
+        while '~' not in input():
+            pass
 
 
 def return_parser():
