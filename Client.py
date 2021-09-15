@@ -89,7 +89,10 @@ class Client(Socket):
         while True:
             if not self.__keyboard_inputs.empty():
                 key = self.__keyboard_inputs.get()
-                keyboard.press_and_release(key)
+                if key == '.':
+                    keyboard.write('.')
+                else:
+                    keyboard.press_and_release(key)
             time.sleep(0.07)
 
     def start(self):
