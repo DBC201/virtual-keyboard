@@ -7,7 +7,7 @@ import threading
 from queue import Queue
 
 # setting debug to true supresses key presses and mouse movements
-DEBUG = True
+DEBUG = False
 
 
 def smoothen_raw(final_x, final_y):
