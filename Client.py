@@ -6,6 +6,9 @@ import time
 import threading
 from queue import Queue
 
+# setting debug to true supresses key presses and mouse movements
+DEBUG = True
+
 
 def smoothen_raw(final_x, final_y):
     """
@@ -107,6 +110,10 @@ class Client(Socket):
                         try:
                             if self.verbose:
                                 print(d)
+
+                            if DEBUG:
+                                continue
+
                             if d[:len("key")] == "key":
                                 self.__keyboard_inputs.put(d[len("key"):])
                                 # pass
