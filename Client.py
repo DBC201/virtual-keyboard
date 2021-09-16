@@ -91,6 +91,8 @@ class Client(Socket):
                 key = self.__keyboard_inputs.get()
                 if key == '.':
                     keyboard.write('.')
+                elif key == '\'':
+                    keyboard.write('\'')
                 else:
                     keyboard.press_and_release(key)
             time.sleep(0.07)
