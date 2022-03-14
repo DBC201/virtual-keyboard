@@ -51,6 +51,7 @@ class Client(Socket):
         self.verbose = verbose
         self.__keyboard_inputs = Queue()
         self.threads = Queue()
+        self.lock = threading.Lock()
 
     def kill_threads(self):
         while not self.threads.empty():
@@ -120,7 +121,9 @@ class Client(Socket):
                                 continue
 
                             if d[:len("key")] == "key":
+                                self.lock.acquire()
                                 self.__keyboard_inputs.put(d[len("key"):])
+                                self.lock.release()
                                 # pass
                             elif d[:len("move")] == "move":
                                 # x, y = list(map(int, d[len("move"):].split(',')))
