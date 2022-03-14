@@ -13,6 +13,7 @@ class Server(Socket):
         self.clients = []
         self.sender = None
         self.threads = Queue()
+        self.lock = threading.Lock()
         print("Listening to port:", self.port)
 
     def run(self):
@@ -38,6 +39,7 @@ class Server(Socket):
         """
         while True:
             accept = self.sock.accept()
+            self.lock.acquire()
             print()
             print("Received connection from: " + str(accept[1][0]) + ":" + str(accept[1][1]))
             try:
@@ -55,27 +57,29 @@ class Server(Socket):
                     accept[0].close()
             except Exception as e:
                 print("listen thread:", e)
+            self.lock.release()
 
-    @staticmethod
-    def update_connected(connected):
+    def update_connected(self):
         """
         Checks if existing connections are still alive
         """
+        self.lock.acquire()
         connected_string = "Current connections\n"
-        for i, accept in enumerate(connected):
+        for i, accept in enumerate(self.clients):
             try:
                 accept[0].send(b'live')
             except Exception as e:
                 # print(e)
-                del connected[i]
+                del self.clients[i]
             connected_string += str(i) + ": " + str(accept[1][0]) + ":" + str(accept[1][1]) + '\n'
+        self.lock.release()
         return connected_string
 
     def update_clients(self):
         """
         see update_connected()
         """
-        return Server.update_connected(self.clients)
+        return self.update_connected()
 
     def update_senders(self):
         """
