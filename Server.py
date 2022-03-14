@@ -35,7 +35,7 @@ class Server(Socket):
 
     def listen(self):
         """
-        listens for incoming connections in a seperate thread
+        listens for incoming connections in a separate thread
         """
         while True:
             accept = self.sock.accept()
@@ -85,10 +85,12 @@ class Server(Socket):
         """
         Updates the sender (there is only one sender as of now)
         """
+        self.lock.acquire()
         try:
             self.send(self.sender[0], b"live")
         except Exception as e:
             self.sender = None
+        self.lock.release()
 
     def start(self):
         """
