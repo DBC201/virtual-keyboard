@@ -88,14 +88,9 @@ class Sender(Client):
                 # data = "move" + str(x) + ',' + str(y)
                 self.source(self.sock, self.yield_data(data.encode()))
             elif type(event) == mouse.ButtonEvent:
+                print(event.button, event.event_type)
                 if event.event_type == "down":
-                    data = "click"
-                    if event.button == "x2":
-                        data += "left"
-                    elif event.button == "x":
-                        data += "right"
-                    else:
-                        return
+                    data = "click" + event.button
                     self.source(self.sock, self.yield_data(data.encode()))
             elif type(event) == mouse.WheelEvent:
                 data = "scroll" + str(event.delta)
