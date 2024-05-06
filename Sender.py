@@ -3,14 +3,14 @@ import mouse
 import socket
 import sys, argparse
 from Client import Client
-import tkinter as tk
-
-root = tk.Tk()
-
-WIDTH = root.winfo_screenwidth()
-HEIGHT = root.winfo_screenheight()
-
-root.destroy()
+# import tkinter as tk
+#
+# root = tk.Tk()
+#
+# WIDTH = root.winfo_screenwidth()
+# HEIGHT = root.winfo_screenheight()
+#
+# root.destroy()
 
 
 class Sender(Client):
@@ -101,7 +101,7 @@ class Sender(Client):
                 data = "scroll" + str(event.delta)
                 self.source(self.sock, self.yield_data(data.encode()))
             # mouse.move(0, 0)
-            mouse.move(WIDTH // 2, HEIGHT // 2)
+            # mouse.move(WIDTH // 2, HEIGHT // 2)
         mouse.hook(process_mouse_events)
 
     def listen_keyboard_and_mouse(self):

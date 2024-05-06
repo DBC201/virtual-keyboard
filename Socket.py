@@ -32,7 +32,7 @@ class Socket:
 
             i = 0
             while i < size:
-                response = conn.recv(self.bufsz)
+                response = conn.recv(min(size - i, self.bufsz))
                 handle_data(response)
                 i += len(response)
             break
