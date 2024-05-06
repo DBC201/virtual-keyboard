@@ -38,23 +38,23 @@ class Server(Socket):
         listens for incoming connections in a separate thread
         """
         while True:
-            accept = self.sock.accept()
+            connection = self.sock.accept()
             self.lock.acquire()
             print()
-            print("Received connection from: " + str(accept[1][0]) + ":" + str(accept[1][1]))
+            print("Received connection from: " + str(connection[1][0]) + ":" + str(connection[1][1]))
             try:
-                self.send(accept[0], b"status")
-                status = self.receive(accept[0])[0]
+                self.source(connection[0], self.yield_data("status".encode()))
+                status = self.receive_data(connection[0]).decode()
                 print(status)
                 if status == "client":
-                    self.clients.append(accept)
+                    self.clients.append(connection)
                 elif status == "sender":
                     if self.sender:
-                        accept[0].close()
+                        connection[0].close()
                     else:
-                        self.sender = accept
+                        self.sender = connection
                 else:
-                    accept[0].close()
+                    connection[0].close()
             except Exception as e:
                 print("listen thread:", e)
             self.lock.release()
@@ -67,7 +67,7 @@ class Server(Socket):
         connected_string = "Current connections\n"
         for i, accept in enumerate(self.clients):
             try:
-                accept[0].send(b'live')
+                self.source(accept[0], self.yield_data("live".encode()))
             except Exception as e:
                 # print(e)
                 del self.clients[i]
@@ -87,7 +87,7 @@ class Server(Socket):
         """
         self.lock.acquire()
         try:
-            self.send(self.sender[0], b"live")
+            self.source(self.sender[0], self.yield_data("live".encode()))
         except Exception as e:
             self.sender = None
         self.lock.release()
@@ -101,21 +101,19 @@ class Server(Socket):
             while self.sender is not None:
                 try:
                     print("listening")
-                    data = self.receive(self.sender[0])
-                    for inp in data:
-                        print("sender:", inp)
-                        if inp == "exit":
-                            self.sender = None
-                        elif inp == "list":
-                            # self.send(self.sender[0], self.update_clients().encode())
-                            self.update_clients()
-                            self.send(self.sender[0], str(len(self.clients)).encode())  # to decrease bufsz to 64
-                        else:
-                            try:
-                                client = self.clients[int(inp)][0]
-                                self.link(self.sender[0], client)
-                            except:
-                                self.send(self.sender[0], b"error")
+                    data = self.receive_data(self.sender[0])
+                    print(data)
+                    if data == b"exit":
+                        self.sender = None
+                    elif data == b"list":
+                        res = self.update_clients()
+                        self.source(self.sender[0], self.yield_data(res.encode()))
+                    else:
+                        try:
+                            client = self.clients[int(data)][0]
+                            self.link(self.sender[0], client)
+                        except:
+                            self.source(self.sender[0], self.yield_data("error".encode()))
                 except Exception as e:
                     print("start:", e)
                     break
@@ -128,15 +126,13 @@ class Server(Socket):
         Link sender with client to transfer data
         """
         try:
-            self.send(sender_conn, b"connected")
+            self.source(sender_conn, self.yield_data("connected".encode()))
             while True:
-                sender_data = self.receive(sender_conn)
-                for data in sender_data:
-                    print(data)
-                    if data == "key~":
-                        return
-                    else:
-                        self.send(client_conn, data.encode())
+                sender_data = self.receive_data(sender_conn)
+                if sender_data == b"key~":
+                    return
+                else:
+                    self.source(client_conn, self.yield_data(sender_data))
         except Exception as e:
             print("link:", e)
             self.update_clients()

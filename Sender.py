@@ -3,6 +3,14 @@ import mouse
 import socket
 import sys, argparse
 from Client import Client
+import tkinter as tk
+
+root = tk.Tk()
+
+WIDTH = root.winfo_screenwidth()
+HEIGHT = root.winfo_screenheight()
+
+root.destroy()
 
 
 def truncate(num):
@@ -34,28 +42,26 @@ class Sender(Client):
         could be regarded as the menu
         """
         try:
-            data = self.receive(self.sock)[0]
+            data = self.receive_data(self.sock).decode()
             if data != "status":
                 raise RuntimeError("No status requested")
             else:
-                self.send(self.sock, b"sender")
+                self.source(self.sock, self.yield_data("sender".encode()))
             while True:
-                inp = input("->").encode()
-                if inp == b"exit":
-                    self.send(self.sock, b"exit")
+                inp = input("->")
+                if inp == "exit":
+                    self.source(self.sock, self.yield_data("exit".encode()))
                     return
-                self.send(self.sock, inp)
-                data = self.receive(self.sock)
+                self.source(self.sock, self.yield_data(inp.encode()))
+                data = self.receive_data(self.sock).decode()
                 print(data)
-                for d in data:
-                    if d == "status":
-                        self.send(self.sock, b"sender")
-                    elif d == "live":
-                        continue
-                    elif d == "connected":
-                        self.listen_keyboard_and_mouse()
-                    else:
-                        print(d)
+                if data == "status":
+                    self.source(self.sock, self.yield_data("sender".encode()))
+                elif data == "live":
+                    continue
+                elif data == "connected":
+                    self.listen_keyboard_and_mouse()
+
         except ConnectionResetError:
             Sender.__handle_connection_reset()
         except Exception as e:
@@ -65,8 +71,8 @@ class Sender(Client):
         """
         the function for keyboard.hook(), sends the key presses to the server
         """
-        data = b"key" + keyevent.name.encode()
-        self.send(self.sock, data)
+        data = "key" + keyevent.name
+        self.source(self.sock, self.yield_data(data.encode()))
         if keyevent.name == '~':
             keyboard.unhook_all()
             mouse.unhook_all()
@@ -87,7 +93,7 @@ class Sender(Client):
                 data = "move" + str(dx) + ',' + str(dy)
                 # x, y = mouse.get_position()
                 # data = "move" + str(x) + ',' + str(y)
-                self.send(self.sock, data.encode())
+                self.source(self.sock, self.yield_data(data.encode()))
             elif type(event) == mouse.ButtonEvent:
                 if event.event_type == "down":
                     data = "click"
@@ -97,11 +103,12 @@ class Sender(Client):
                         data += "right"
                     else:
                         return
-                    self.send(self.sock, data.encode())
+                    self.source(self.sock, self.yield_data(data.encode()))
             elif type(event) == mouse.WheelEvent:
                 data = "scroll" + str(event.delta)
-                self.send(self.sock, data.encode())
+                self.source(self.sock, self.yield_data(data.encode()))
             # mouse.move(0, 0)
+            mouse.move(WIDTH // 2, HEIGHT // 2)
         mouse.hook(process_mouse_events)
 
     def listen_keyboard_and_mouse(self):

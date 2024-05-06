@@ -6,9 +6,6 @@ import time
 import threading
 from queue import Queue
 
-# setting debug to true supresses key presses and mouse movements
-DEBUG = False
-
 
 def smoothen_raw(final_x, final_y):
     """
@@ -45,13 +42,14 @@ def smoothen(dx, dy):
 
 
 class Client(Socket):
-    def __init__(self, ip, port, verbose=True, loop=False):
+    def __init__(self, ip, port, verbose=True, loop=False, debug=False):
         super().__init__(ip, port)
         self.loop = loop
         self.verbose = verbose
         self.__keyboard_inputs = Queue()
         self.threads = Queue()
         self.lock = threading.Lock()
+        self.debug = debug
 
     def kill_threads(self):
         while not self.threads.empty():
@@ -88,6 +86,7 @@ class Client(Socket):
 
     def __keyboard_thread(self):
         while True:
+            self.lock.acquire()
             if not self.__keyboard_inputs.empty():
                 key = self.__keyboard_inputs.get()
                 if key == '.':
@@ -96,6 +95,7 @@ class Client(Socket):
                     keyboard.write('\'')
                 else:
                     keyboard.press_and_release(key)
+            self.lock.release()
             time.sleep(0.07)
 
     def start(self):
@@ -104,40 +104,40 @@ class Client(Socket):
         keyboard_thread.start()
         try:
             while True:
-                data = self.receive(self.sock)
-                for d in data:
-                    if d == "status":
-                        self.send(self.sock, b"client")
-                    if d == "live":
-                        continue
-                    elif d == "exit":
-                        return
-                    else:
-                        try:
-                            if self.verbose:
-                                print(d)
+                data = self.receive_data(self.sock).decode()
+                if data == "status":
+                    self.source(self.sock, self.yield_data("client".encode()))
+                if data == "live":
+                    continue
+                elif data == "exit":
+                    return
+                else:
+                    try:
+                        if self.verbose:
+                            print(data)
 
-                            if DEBUG:
-                                continue
+                        if self.debug:
+                            continue
 
-                            if d[:len("key")] == "key":
-                                self.lock.acquire()
-                                self.__keyboard_inputs.put(d[len("key"):])
-                                self.lock.release()
-                                # pass
-                            elif d[:len("move")] == "move":
-                                # x, y = list(map(int, d[len("move"):].split(',')))
-                                # smoothen_raw(x, y)
-                                dx, dy = list(map(int, d[len("move"):].split(',')))
-                                smoothen(dx, dy)
-                            elif d[:len("click")] == "click":
-                                mouse.click(d[len("click"):])
-                                pass
-                            elif d[:len("scroll")] == "scroll":
-                                delta = float(d[len("scroll"):])
-                                mouse.wheel(delta)
-                        except:
+                        if data[:len("key")] == "key":
+                            self.lock.acquire()
+                            self.__keyboard_inputs.put(data[len("key"):])
+                            self.lock.release()
+                            # pass
+                        elif data[:len("move")] == "move":
+                            # x, y = list(map(int, d[len("move"):].split(',')))
+                            # smoothen_raw(x, y)
+                            dx, dy = list(map(int, data[len("move"):].split(',')))
+                            smoothen(dx, dy)
+                        elif data[:len("click")] == "click":
+                            mouse.click(data[len("click"):])
                             pass
+                        elif data[:len("scroll")] == "scroll":
+                            delta = float(data[len("scroll"):])
+                            mouse.wheel(delta)
+                    except:
+                        pass
+
         except ConnectionResetError:
             if self.verbose:
                 print("\nServer shut down.")
@@ -156,6 +156,8 @@ def return_parser():
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose")
     parser.add_argument("-l", "--loop", action="store_true", dest="loop",
                         help="Program will attempt to connect indefinitely unless halted")
+    parser.add_argument("-d", "--debug", action="store_true", dest="debug",
+                        help="Program will not send key presses and mouse movements")
     return parser
 
 
@@ -164,8 +166,11 @@ if __name__ == '__main__':
     args = parser.parse_args(sys.argv[1:])
     verbose = False
     loop = False
+    debug = False
     if args.verbose:
         verbose = True
     if args.loop:
         loop = True
-    Client(args.ip, args.port, verbose, loop).run()
+    if args.debug:
+        debug = True
+    Client(args.ip, args.port, verbose, loop, debug).run()
