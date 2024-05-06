@@ -13,13 +13,6 @@ HEIGHT = root.winfo_screenheight()
 root.destroy()
 
 
-def truncate(num):
-    num *= 10000
-    num = int(num)
-    num /= 10000
-    return num
-
-
 class Sender(Client):
     def __init__(self, ip, port):
         super().__init__(ip, port)
